@@ -1,0 +1,13 @@
+Task 2.
+
+The first 5 jobs involve execution of all transformations (repartition, filter, select, groupBy, count) up to the first collect().
+So the first collect() retrieves the intermediate results.
+After that we apply where("count > 2") to filter the grouped data and second collect() to retrieve the final filtered results.
+Each collect() action triggers the entire transformation pipeline from the beginning.
+Since we're performing two separate collect() actions without caching intermediate results, Spark has to recompute the transformations
+for each action. This leads to additional jobs being triggered.
+
+Task 3.
+By calling .cache(), Spark stores the results of nuek_processed_cached after the first collect(). The result is cached in memory.
+Therefore, when the second collect() is called after applying the additional filter where("count > 2"),
+Spark reuses the cached data instead of recomputing the entire transformation pipeline. This results in Jobs 5-7 instead of Jobs 5-8.
